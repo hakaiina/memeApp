@@ -5,4 +5,5 @@ Lib/
 
 *.log
 pyvenv.cfg
+memeApp.db
 CACHEDIR.TAG

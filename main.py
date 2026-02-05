@@ -1,8 +1,15 @@
 import pygame
 from config import SCREEN_WIDTH, SCREEN_HEIGHT, FPS
 from screens.main_screen import MainScreen
+from db.database import init_db, seed_test_data
+
+
 
 def main():
+    init_db()
+
+    seed_test_data()
+
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Мемография: ГИА по мемам")
