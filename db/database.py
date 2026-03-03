@@ -2,113 +2,76 @@ import sqlite3
 from config import DB_PATH
 
 
-def connect_db():
-    return sqlite3.connect(DB_PATH)
+class Database:
+    def __init__(self):
+        self.conn = None
+        self.init_db()
 
+    def connect(self):
+        self.conn = sqlite3.connect(DB_PATH)
+        return self.conn
 
-def init_db():
-    conn = connect_db()
-    cursor = conn.cursor()
+    def close(self):
+        if self.conn:
+            self.conn.close()
 
-    #users
-    cursor.execute("""
-                   CREATE TABLE IF NOT EXISTS users
-                   (
-                       id
-                       INTEGER
-                       PRIMARY
-                       KEY
-                       AUTOINCREMENT,
-                       nickname
-                       TEXT
-                       NOT
-                       NULL
-                       UNIQUE,
-                       best_score
-                       INTEGER
-                       NOT
-                       NULL
-                       DEFAULT
-                       0,
-                       created_at
-                       TEXT
-                       NOT
-                       NULL
-                       DEFAULT
-                       CURRENT_TIMESTAMP
-                   )
-                   """)
+    def init_db(self):
+        conn = self.connect()
+        cursor = conn.cursor()
 
-    # questions
-    cursor.execute("""
-                   CREATE TABLE IF NOT EXISTS questions
-                   (
-                       id
-                       INTEGER
-                       PRIMARY
-                       KEY
-                       AUTOINCREMENT,
-                       question
-                       TEXT
-                       NOT
-                       NULL,
-                       image_path
-                       TEXT,
-                       option_a
-                       TEXT
-                       NOT
-                       NULL,
-                       option_b
-                       TEXT
-                       NOT
-                       NULL,
-                       option_c
-                       TEXT
-                       NOT
-                       NULL,
-                       option_d
-                       TEXT
-                       NOT
-                       NULL,
-                       correct_option
-                       TEXT
-                       NOT
-                       NULL
-                       CHECK (
-                       correct_option
-                       IN
-                   (
-                       'A',
-                       'B',
-                       'C',
-                       'D'
-                   )
+        #users
+        cursor.execute("""
+                       CREATE TABLE IF NOT EXISTS users
+                       (
+                           id
+                           INTEGER
+                           PRIMARY
+                           KEY
+                           AUTOINCREMENT,
+                           nickname
+                           TEXT
+                           NOT
+                           NULL
+                           UNIQUE,
+                           password TEXT
+                           NOT NULL,
+                           best_score
+                           INTEGER
+                           NOT
+                           NULL
+                           DEFAULT
+                           0,
+                           created_at
+                           TEXT
+                           NOT
+                           NULL
+                           DEFAULT
+                           CURRENT_TIMESTAMP
                        )
-                       )
-                   """)
-
-    conn.commit()
-    conn.close()
+                       """)
+        conn.commit()
+        conn.close()
 
 
-def get_or_create_user(nickname):
-    conn = connect_db()
-    cursor = conn.cursor()
-    cursor.execute("INSERT OR IGNORE INTO users (nickname) VALUES (?)", (nickname,))
+    # registration
+    def add_user(self, nickname, password):
+        try:
+            conn = self.connect()
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT OR IGNORE INTO users (nickname, password) VALUES (?, ?)",
+                (nickname, password)
+            )
+            return True
+        except Exception:
+            return False
 
-    cursor.execute("SELECT id, nickname, best_score FROM users WHERE nickname = ?", (nickname,))
-
-    user = cursor.fetchone()
-    conn.close()
-    return user
-
-
-#testing data
-def seed_test_data():
-    conn = connect_db()
-    cursor = conn.cursor()
-    cursor.execute(""
-                   "INSERT OR IGNORE INTO users (nickname, best_score) VALUES (?, ?)",
-                   ('best teamlead', 50))
-    conn.commit()
-    conn.close()
+    #testing data
+    # def seed_test_data():
+    #     conn = connect_db()
+    #     cursor = conn.cursor()
+    #     cursor.execute(""
+    #                    "INSERT OR IGNORE INTO users (nickname, password, best_score) VALUES (?, ?, ?)",
+    #                    ('best teamlead', '12345', 50))
+    #     conn.commit()
+    #     conn.close()

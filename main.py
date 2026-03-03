@@ -1,21 +1,28 @@
 import pygame
 from config import SCREEN_WIDTH, SCREEN_HEIGHT, FPS
 from screens.main_screen import MainScreen
-from db.database import init_db, seed_test_data
-
+from db.database import Database
+from screens.registr_screen import RegisterScreen
 
 
 def main():
-    init_db()
-
-    seed_test_data()
+    db = Database()
+    db.init_db()
 
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     pygame.display.set_caption("Мемография: ГИА по мемам")
 
     clock = pygame.time.Clock()
-    current_screen = MainScreen(screen)
+
+    # switch screens
+    current_screen = None
+
+    def screen_switch(new_screen):
+        nonlocal current_screen
+        current_screen = new_screen
+
+    current_screen = RegisterScreen(screen, db, screen_switch)
 
     running = True
     while running:
@@ -31,6 +38,7 @@ def main():
 
         pygame.display.flip()
 
+    db.close()
     pygame.quit()
 
 if __name__ == "__main__":
