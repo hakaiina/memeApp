@@ -62,9 +62,23 @@ class Database:
                 "INSERT OR IGNORE INTO users (nickname, password) VALUES (?, ?)",
                 (nickname, password)
             )
-            return True
-        except Exception:
+
+            conn.commit()
+
+            if cursor.rowcount > 0:
+                print(f"Пользователь {nickname} успешно добавлен")
+                return True
+            else:
+                print(f"Пользователь {nickname} уже существует")
+                return False
+        except Exception as e:
+            print(f"Ошибка при добавлении пользователя: {e}")
+            if conn:
+                conn.rollback()
             return False
+        finally:
+            if conn:
+                conn.close()
 
     #testing data
     # def seed_test_data():
