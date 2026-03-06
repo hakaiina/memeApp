@@ -1,5 +1,6 @@
 import pygame
 from ui.button import Button
+from screens.quiz_screen import QuizScreen
 from config import SCREEN_WIDTH, SCREEN_HEIGHT, BUTTON_SIZE
 
 
@@ -70,7 +71,7 @@ class MainScreen:
         )
 
     def start_game(self):
-        print("START TEST")
+        print("START GAME")
 
     def handle_event(self, event):
         self.start_button.handle_event(event)
