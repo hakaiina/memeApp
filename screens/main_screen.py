@@ -5,8 +5,11 @@ from config import SCREEN_WIDTH, SCREEN_HEIGHT, BUTTON_SIZE
 
 
 class MainScreen:
-    def __init__(self, screen):
+    def __init__(self, screen, db, switch_screen, username):
         self.screen = screen
+        self.db = db
+
+        self.switch_screen = switch_screen
 
         # fonts
         pygame.font.init()
@@ -14,6 +17,7 @@ class MainScreen:
 
         self.title_font = pygame.font.Font(font_path, 64)
         self.subtitle_font = pygame.font.Font(font_path, 48)
+        self.user_font = pygame.font.Font(font_path, 24)
 
         # background
         self.logo = pygame.image.load(
@@ -41,15 +45,51 @@ class MainScreen:
 
         # text positions
         self.title_rect = self.title_surface.get_rect(
-            center=(SCREEN_WIDTH // 2, 80)
+            center=(SCREEN_WIDTH // 2, 110)
         )
 
         self.subtitle_rect = self.subtitle_surface.get_rect(
-            center=(SCREEN_WIDTH // 2, 165)
+            center=(SCREEN_WIDTH // 2, 195)
         )
+
+        # user info
+        self.create_user_info(username)
 
         # start button
         self.start_button = self.create_start_button()
+
+
+    def create_user_info(self, username):
+        if username:
+            self.user_name_surface = self.user_font.render(
+                f"Игрок: {username}",
+                True,
+                (50, 50, 150)
+            )
+
+            self.user_name_rect = self.user_name_surface.get_rect(
+                topright=(SCREEN_WIDTH - 20, 20)
+            )
+
+            best_score = self.db.get_user_score(username)
+            self.user_score_surface = self.user_font.render(
+                f"Рекорд: {best_score}",
+                True,
+                (50, 50, 150)
+            )
+
+            self.user_score_rect = self.user_score_surface.get_rect(
+                topright=(SCREEN_WIDTH - 20, 50)
+            )
+        else:
+            self.user_name_surface = self.user_font.render(
+                "Игрок: Гость",
+                True,
+                (50, 50, 150)
+            )
+            self.user_name_rect = self.user_name_surface.get_rect(
+                topright=(SCREEN_WIDTH - 20, 20)
+            )
 
     def create_start_button(self):
         normal = pygame.image.load(
@@ -71,6 +111,8 @@ class MainScreen:
         )
 
     def start_game(self):
+        from screens.quiz_screen import QuizScreen
+        self.switch_screen(QuizScreen(self.screen, self.switch_screen))
         print("START GAME")
 
     def handle_event(self, event):
@@ -85,5 +127,10 @@ class MainScreen:
         self.screen.blit(self.logo, self.logo_rect)
         self.screen.blit(self.title_surface, self.title_rect)
         self.screen.blit(self.subtitle_surface, self.subtitle_rect)
+
+        if hasattr(self, 'user_name'):
+            self.screen.blit(self.user_name_surface, self.user_name_rect)
+            if hasattr(self, 'user_score'):
+                self.screen.blit(self.user_score_surface, self.user_score_rect)
 
         self.start_button.draw(self.screen)

@@ -81,9 +81,9 @@ class RegisterScreen:
         if self.username and self.password:
             self.db.add_user(self.username, self.password)
 
-            # transition to the test
+            # transition to the main screen
             from screens.main_screen import MainScreen
-            self.switch_screen(MainScreen(self.screen))
+            self.switch_screen(MainScreen(self.screen, self.db, self.switch_screen, self.username))
 
 
     def handle_event(self, event):

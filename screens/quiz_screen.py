@@ -27,6 +27,7 @@ class QuizScreen:
         self.selected_answer = None
 
         # text input
+        self.active_input = False
         self.user_text = ""
 
         # buttons
@@ -130,7 +131,14 @@ class QuizScreen:
                 button.handle_event(event)
 
         if question["type"] == "text":
-            if event.key == pygame.KEYDOWN:
+            # select field by click
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if self.input_box.collidepoint(event.pos):
+                    self.active_input = True
+                else:
+                    self.active_input = False
+
+            if event.type == pygame.KEYDOWN and self.active_input:
                 if event.key == pygame.K_BACKSPACE:
                     self.user_text = self.user_text[:-1]
                 else:
@@ -184,20 +192,20 @@ class QuizScreen:
 
         # TEXT ANSWER
         if question["type"] == "text":
-            input_box = pygame.Rect(
+            self.input_box = pygame.Rect(
                 SCREEN_WIDTH // 2 - 200,
                 420,
                 400,
                 60
             )
-            pygame.draw.rect(self.screen, (200, 200, 200), input_box)
+            pygame.draw.rect(self.screen, (200, 200, 200), self.input_box)
 
             text_surface = self.title_font.render(
                 self.user_text,
                 True,
                 (0, 0, 0)
             )
-            self.screen.blit(text_surface, (input_box.x + 10, input_box.y + 10))
+            self.screen.blit(text_surface, (self.input_box.x + 10, self.input_box.y + 10))
 
         # buttons
         self.submit_button.draw(self.screen)

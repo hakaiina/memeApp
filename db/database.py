@@ -80,6 +80,36 @@ class Database:
             if conn:
                 conn.close()
 
+    # get user best score for main window
+    def get_user_score(self, nickname):
+        best_score = 0
+        conn = None
+        try:
+            conn = self.connect()
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT best_score FROM users WHERE nickname = ?",
+                (nickname,)
+            )
+
+            result = cursor.fetchone()
+
+            if result is not None:
+                best_score = result[0] if result[0] is not None else 0
+            else:
+                print(f"Пользователь {nickname} не найден")
+                return None
+
+        except Exception as e:
+            print(f"Ошибка при запросе данных пользователя: {e}")
+            return None
+
+        finally:
+            if conn:
+                conn.close()
+
+        return best_score
+
     #testing data
     # def seed_test_data():
     #     conn = connect_db()
