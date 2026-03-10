@@ -7,7 +7,9 @@ from config import SCREEN_WIDTH, SCREEN_HEIGHT, BUTTON_SIZE
 class MainScreen:
     def __init__(self, screen, db, switch_screen, username):
         self.screen = screen
+
         self.db = db
+        self.username = username
 
         self.switch_screen = switch_screen
 
@@ -53,16 +55,16 @@ class MainScreen:
         )
 
         # user info
-        self.create_user_info(username)
+        self.create_user_info()
 
         # start button
         self.start_button = self.create_start_button()
 
 
-    def create_user_info(self, username):
-        if username:
+    def create_user_info(self):
+        if self.username:
             self.user_name_surface = self.user_font.render(
-                f"Игрок: {username}",
+                f"Игрок: {self.username}",
                 True,
                 (50, 50, 150)
             )
@@ -71,7 +73,7 @@ class MainScreen:
                 topright=(SCREEN_WIDTH - 20, 20)
             )
 
-            best_score = self.db.get_user_score(username)
+            best_score = self.db.get_user_score(self.username)
             self.user_score_surface = self.user_font.render(
                 f"Рекорд: {best_score}",
                 True,
@@ -112,7 +114,7 @@ class MainScreen:
 
     def start_game(self):
         from screens.quiz_screen import QuizScreen
-        self.switch_screen(QuizScreen(self.screen, self.switch_screen))
+        self.switch_screen(QuizScreen(self.screen, self.db, self.switch_screen, self.username))
         print("START GAME")
 
     def handle_event(self, event):
@@ -128,9 +130,9 @@ class MainScreen:
         self.screen.blit(self.title_surface, self.title_rect)
         self.screen.blit(self.subtitle_surface, self.subtitle_rect)
 
-        if hasattr(self, 'user_name'):
+        if hasattr(self, 'user_name_surface'):
             self.screen.blit(self.user_name_surface, self.user_name_rect)
-            if hasattr(self, 'user_score'):
+            if hasattr(self, 'user_score_surface'):
                 self.screen.blit(self.user_score_surface, self.user_score_rect)
 
         self.start_button.draw(self.screen)

@@ -2,6 +2,7 @@ import pygame
 from config import SCREEN_WIDTH, SCREEN_HEIGHT, FPS
 from screens.main_screen import MainScreen
 from db.database import Database
+from screens.quiz_screen import QuizScreen
 from screens.registr_screen import RegisterScreen
 
 
@@ -22,7 +23,8 @@ def main():
         nonlocal current_screen
         current_screen = new_screen
 
-    current_screen = RegisterScreen(screen, db, screen_switch)
+    # current_screen = RegisterScreen(screen, db, screen_switch)
+    current_screen = QuizScreen(screen, db, screen_switch, "name")
 
     running = True
     while running:

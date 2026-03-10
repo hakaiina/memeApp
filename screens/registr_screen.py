@@ -129,7 +129,6 @@ class RegisterScreen:
 
 
     def draw(self):
-
         self.screen.blit(self.background, (0, 0))
 
         title = self.font_text.render("Регистрация", True, (0, 0, 0))
