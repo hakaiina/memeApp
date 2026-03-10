@@ -23,8 +23,7 @@ def main():
         nonlocal current_screen
         current_screen = new_screen
 
-    # current_screen = RegisterScreen(screen, db, screen_switch)
-    current_screen = QuizScreen(screen, db, screen_switch, "name")
+    current_screen = RegisterScreen(screen, db, screen_switch)
 
     running = True
     while running:
