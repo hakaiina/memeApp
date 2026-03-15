@@ -2,6 +2,7 @@ import pygame
 import json
 from ui.button import Button
 from config import SCREEN_WIDTH, SCREEN_HEIGHT
+from logic.score import ScoreCalculator
 
 
 class QuizScreen:
@@ -151,8 +152,23 @@ class QuizScreen:
             self.selected_answers = [index]
 
     def submit_answer(self):
-        """Отправка ответа"""
         question = self.questions[self.current_question]
+
+        # Подсчет баллов через ScoreCalculator
+        if question["type"] == "choice":
+            points = ScoreCalculator.calculate_score(
+                "choice",
+                self.selected_answers,
+                question["correct"]
+            )
+        else:  # text
+            points = ScoreCalculator.calculate_score(
+                "text",
+                self.user_text,
+                question["answer"]
+            )
+
+        self.score += points
 
         # Сохраняем ответ
         if question["type"] == "choice":
@@ -167,7 +183,18 @@ class QuizScreen:
         self.current_question += 1
 
         if self.current_question >= len(self.questions):
-            print(f"Тест завершен! Счет: {self.score}")
+            # Переходим на экран результатов
+            from screens.result_screen import ResultScreen
+            self.switch_screen(
+                ResultScreen(
+                    self.screen,
+                    self.db,
+                    self.switch_screen,
+                    self.username,
+                    self.score,
+                    self.questions
+                )
+            )
 
     def go_back(self):
         """Возврат к предыдущему вопросу"""

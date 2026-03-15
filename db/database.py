@@ -110,12 +110,43 @@ class Database:
 
         return best_score
 
-    #testing data
-    # def seed_test_data():
-    #     conn = connect_db()
-    #     cursor = conn.cursor()
-    #     cursor.execute(""
-    #                    "INSERT OR IGNORE INTO users (nickname, password, best_score) VALUES (?, ?, ?)",
-    #                    ('best teamlead', '12345', 50))
-    #     conn.commit()
-    #     conn.close()
+    def update_best_score(self, nickname, new_score):
+        conn = None
+        try:
+            conn = self.connect()
+            cursor = conn.cursor()
+
+            # Получаем текущий лучший счет
+            cursor.execute(
+                "SELECT best_score FROM users WHERE nickname = ?",
+                (nickname,)
+            )
+            result = cursor.fetchone()
+
+            if result:
+                current_best = result[0] if result[0] is not None else 0
+
+                # Обновляем только если новый счет больше
+                if new_score > current_best:
+                    cursor.execute(
+                        "UPDATE users SET best_score = ? WHERE nickname = ?",
+                        (new_score, nickname)
+                    )
+                    conn.commit()
+                    print(f"Рекорд обновлен: {current_best} -> {new_score}")
+                    return True
+                else:
+                    print(f"Новый счет {new_score} не превышает рекорд {current_best}")
+                    return False
+            else:
+                print(f"Пользователь {nickname} не найден")
+                return False
+
+        except Exception as e:
+            print(f"Ошибка при обновлении рекорда: {e}")
+            if conn:
+                conn.rollback()
+            return False
+        finally:
+            if conn:
+                conn.close()

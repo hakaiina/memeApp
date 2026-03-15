@@ -1,12 +1,13 @@
 class ScoreCalculator:
 
+    # Веса для разных типов вопросов
     WEIGHTS = {
         "choice": 1,
-        "text": 3
+        "text": 2
     }
 
     @staticmethod
-    def calculate_score(question_type, user_answer, correct_answers, selected_index=None):
+    def calculate_score(question_type, user_answer, correct_answers):
         if question_type == "choice":
             return ScoreCalculator._calculate_choice_score(user_answer, correct_answers)
         elif question_type == "text":
@@ -14,16 +15,15 @@ class ScoreCalculator:
         return 0
 
     @staticmethod
-    def _calculate_choice_score(selected_index, correct_answers):
-        if selected_index is None:
+    def _calculate_choice_score(selected_answers, correct_answers):
+        if not selected_answers:
             return 0
 
-        if isinstance(correct_answers, list):
-            if selected_index in correct_answers:
-                return ScoreCalculator.WEIGHTS["choice"]
-        else:
-            if selected_index == correct_answers:
-                return ScoreCalculator.WEIGHTS["choice"]
+        selected_set = set(selected_answers)
+        correct_set = set(correct_answers)
+
+        if selected_set == correct_set:
+            return ScoreCalculator.WEIGHTS["choice"]
 
         return 0
 
@@ -34,6 +34,7 @@ class ScoreCalculator:
 
         user_answer = user_text.lower().strip()
 
+        # correct_answers всегда список возможных правильных ответов
         for answer in correct_answers:
             if user_answer == answer.lower().strip():
                 return ScoreCalculator.WEIGHTS["text"]
@@ -50,10 +51,16 @@ class ScoreCalculator:
 
     @staticmethod
     def get_score_percentage(score, max_score):
+        """
+        Получить процент правильных ответов
+
+        Args:
+            score (int): Набранные баллы
+            max_score (int): Максимальный балл
+
+        Returns:
+            float: Процент правильных ответов
+        """
         if max_score == 0:
             return 0
         return (score / max_score) * 100
-
-
-def calculate_score(question_type, user_answer, correct_answers):
-    return ScoreCalculator.calculate_score(question_type, user_answer, correct_answers)
